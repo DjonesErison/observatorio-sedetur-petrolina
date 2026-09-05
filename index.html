@@ -280,7 +280,15 @@
   @media (max-width: 860px){
     .kpi-grid{ grid-template-columns: repeat(2,1fr); }
     .change-grid{ grid-template-columns: 1fr 1fr; }
-    .tabs{ display:none; }
+    .topbar{ flex-wrap:wrap; }
+    .tabs{
+      order:3; flex-basis:100%; width:100%;
+      flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+      gap:2px; margin-top:10px; padding:10px 0 2px; border-top:1px solid var(--line);
+      scrollbar-width:none;
+    }
+    .tabs::-webkit-scrollbar{ display:none; }
+    .tab{ flex:0 0 auto; }
   }
   @media (max-width: 560px){
     .kpi-grid{ grid-template-columns: 1fr; }
