@@ -3,6 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Índice de Imagem · Observatório SEDETUR</title>
 <meta name="description" content="Pesquisa de imagem turística de Petrolina — protótipo do Índice de Imagem Turística.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -147,6 +152,8 @@
   footer{ padding:30px 0 10px; border-top:1px solid var(--line); margin-top:30px; }
   footer p{ font-size:12px; color:var(--muted); line-height:1.6; max-width:760px; }
 </style>
+</head>
+<body>
 </head>
 <body>
 <div class="gov-strip"></div>
@@ -298,37 +305,33 @@
     });
   });
 
-  var dbPromise = (window.claude && window.claude.use) ? window.claude.use('db') : Promise.resolve(null);
-
   formEl.addEventListener('submit', function(e){
     e.preventDefault();
     if(rating === 0){ alert('Dá uma nota pra cidade antes de enviar :)'); return; }
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando…';
-    dbPromise.then(function(db){
-      if(!db){
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Enviar resposta';
-        alert('Armazenamento não disponível nesta visualização — não deu pra salvar a resposta agora.');
-        return;
-      }
-      var body = {
-        nota: rating,
-        recomenda: recomenda,
-        voltaria: voltaria,
-        gostou: document.getElementById('gostou').value.slice(0, 500),
-        faltou: document.getElementById('faltou').value.slice(0, 500),
-        origem: document.getElementById('origem').value.slice(0, 120),
-        ts: Date.now()
-      };
-      return db.collection('respostas').add(body).then(function(){
-        formEl.hidden = true;
-        thanksEl.hidden = false;
-      });
+    var body = {
+      nota: rating,
+      recomenda: recomenda,
+      voltaria: voltaria,
+      gostou: document.getElementById('gostou').value.slice(0, 500),
+      faltou: document.getElementById('faltou').value.slice(0, 500),
+      origem: document.getElementById('origem').value.slice(0, 120),
+      ts: Date.now()
+    };
+    fetch('/api/respostas', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    }).then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      formEl.hidden = true;
+      thanksEl.hidden = false;
+      carregarRespostas();
     }).catch(function(err){
       submitBtn.disabled = false;
       submitBtn.textContent = 'Enviar resposta';
-      alert('Não deu pra enviar agora (' + (err && err.code ? err.code : 'erro') + '). Tenta de novo em instantes.');
+      alert('Não deu pra enviar agora. Tenta de novo em instantes.');
     });
   });
 
@@ -365,14 +368,13 @@
     }).join('');
   }
 
-  dbPromise.then(function(db){
-    if(!db) return;
-    db.collection('respostas').limit(500).onSnapshot(function(snap){
-      renderStats(snap.docs.map(function(d){ return d.data() || {}; }));
-    }, function(err){
-      console.warn('db subscribe error', err);
-    });
-  });
+  function carregarRespostas(){
+    fetch('/api/respostas').then(function(r){ return r.json(); }).then(function(docs){
+      renderStats(docs || []);
+    }).catch(function(err){ console.warn('erro ao carregar respostas', err); });
+  }
+  carregarRespostas();
+  setInterval(carregarRespostas, 15000);
 })();
 </script>
 
@@ -390,5 +392,7 @@
     document.querySelectorAll('.dropdown.open').forEach(function(d){ d.classList.remove('open'); });
   });
 </script>
+</body>
+</html>
 </body>
 </html>
