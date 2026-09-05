@@ -110,8 +110,9 @@ jobs:
 
             [Service]
             WorkingDirectory=/opt/observatorio-pesquisa
-            ExecStart=/usr/bin/gunicorn -w 2 -b 127.0.0.1:5001 app:app
+            ExecStart=/usr/bin/python3 -m gunicorn -w 2 -b 127.0.0.1:5001 app:app
             Restart=always
+            RestartSec=2
             User=root
 
             [Install]
@@ -119,43 +120,60 @@ jobs:
             UNITEOF
 
             systemctl daemon-reload
-            systemctl enable --now observatorio-pesquisa
+            systemctl enable observatorio-pesquisa
             systemctl restart observatorio-pesquisa
+            sleep 2
 
             echo "== 5. Adicionando rota /api/* no Caddy (idempotente) =="
             python3 << 'PYEOF'
+            import re
+
             path = '/etc/caddy/Caddyfile'
             with open(path, encoding='utf-8') as f:
                 content = f.read()
 
-            old = """observatoriopetrolina2.com.br, www.observatoriopetrolina2.com.br {
-                root * /var/www/observatoriopetrolina
-                file_server
-                encode gzip
-            }"""
-
-            new = """observatoriopetrolina2.com.br, www.observatoriopetrolina2.com.br {
-                handle /api/* {
-                    reverse_proxy 127.0.0.1:5001
-                }
-                handle {
-                    root * /var/www/observatoriopetrolina
-                    file_server
-                }
-                encode gzip
-            }"""
-
-            if old in content:
-                content = content.replace(old, new)
-                with open(path, 'w', encoding='utf-8') as f:
-                    f.write(content)
-                print("Caddyfile atualizado com rota /api/*")
+            if 'reverse_proxy 127.0.0.1:5001' in content:
+                print("Rota /api/* ja configurada - pulando")
             else:
-                print("Bloco antigo nao encontrado (ja atualizado antes) - pulando")
+                pattern = re.compile(
+                    r'(^observatoriopetrolina2\.com\.br,\s*www\.observatoriopetrolina2\.com\.br\s*\{)(.*?)(^\})',
+                    re.MULTILINE | re.DOTALL
+                )
+                m = pattern.search(content)
+                if not m:
+                    print("ERRO: bloco do dominio observatoriopetrolina2.com.br nao encontrado no Caddyfile")
+                else:
+                    new_block = (
+                        "observatoriopetrolina2.com.br, www.observatoriopetrolina2.com.br {\n"
+                        "    handle /api/* {\n"
+                        "        reverse_proxy 127.0.0.1:5001\n"
+                        "    }\n"
+                        "    handle {\n"
+                        "        root * /var/www/observatoriopetrolina\n"
+                        "        file_server\n"
+                        "    }\n"
+                        "    encode gzip\n"
+                        "}\n"
+                    )
+                    content = content[:m.start()] + new_block + content[m.end():]
+                    with open(path, 'w', encoding='utf-8') as f:
+                        f.write(content)
+                    print("Caddyfile atualizado com rota /api/*")
             PYEOF
 
             caddy validate --config /etc/caddy/Caddyfile
             systemctl reload caddy
+            sleep 1
 
-            echo "== DEPLOY CONCLUIDO COM SUCESSO =="
+            echo "== 6. Diagnostico =="
+            echo "-- status do backend --"
+            systemctl is-active observatorio-pesquisa || true
+            journalctl -u observatorio-pesquisa --no-pager -n 15 || true
+            echo "-- teste local do backend (deve retornar 200) --"
+            curl -s -o /dev/null -w "HTTP %{http_code}\n" http://127.0.0.1:5001/api/respostas || echo "FALHA ao conectar no backend local"
+            echo "-- confirmando rota no Caddyfile --"
+            grep -n "reverse_proxy 127.0.0.1:5001" /etc/caddy/Caddyfile || echo "AVISO: rota /api NAO encontrada no Caddyfile"
+            echo "-- teste via dominio publico (deve retornar 200) --"
+            curl -s -o /dev/null -w "HTTP %{http_code}\n" https://observatoriopetrolina2.com.br/api/respostas || echo "FALHA ao conectar via dominio publico"
 
+            echo "== DEPLOY CONCLUIDO =="
