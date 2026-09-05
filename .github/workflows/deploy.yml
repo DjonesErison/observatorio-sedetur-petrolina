@@ -11,10 +11,13 @@ jobs:
     steps:
       - name: Deploy site + backend to VPS
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         with:
           host: 179.199.134.171
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
+          envs: ADMIN_TOKEN
           script: |
             set -e
 
@@ -30,11 +33,14 @@ jobs:
             echo "== 3. Escrevendo app da API =="
             mkdir -p /opt/observatorio-pesquisa
             cat > /opt/observatorio-pesquisa/app.py << 'PYEOF'
-            import sqlite3, os
+            import sqlite3, os, time
             from flask import Flask, request, jsonify
 
             DB_PATH = os.path.join(os.path.dirname(__file__), 'respostas.db')
+            ADMIN_TOKEN = os.environ.get('ADMIN_TOKEN', '')
             app = Flask(__name__)
+
+            INDICADORES_VALIDOS = {'ocupacao_hoteleira', 'iss_turismo', 'turistas_estimados'}
 
             def get_db():
                 conn = sqlite3.connect(DB_PATH)
@@ -53,6 +59,15 @@ jobs:
                         faltou TEXT,
                         origem TEXT,
                         ts INTEGER
+                    )
+                ''')
+                conn.execute('''
+                    CREATE TABLE IF NOT EXISTS indicadores (
+                        chave TEXT PRIMARY KEY,
+                        valor TEXT,
+                        unidade TEXT,
+                        fonte TEXT,
+                        atualizado_em INTEGER
                     )
                 ''')
                 conn.commit()
@@ -98,17 +113,60 @@ jobs:
                 conn.close()
                 return jsonify([dict(r) for r in rows])
 
+            @app.route('/api/indicadores', methods=['GET'])
+            def listar_indicadores():
+                conn = get_db()
+                rows = conn.execute('SELECT chave, valor, unidade, fonte, atualizado_em FROM indicadores').fetchall()
+                conn.close()
+                resultado = {chave: None for chave in INDICADORES_VALIDOS}
+                for r in rows:
+                    resultado[r['chave']] = dict(r)
+                return jsonify(resultado)
+
+            @app.route('/api/indicadores', methods=['POST'])
+            def atualizar_indicador():
+                token = request.headers.get('X-Admin-Token', '')
+                if not ADMIN_TOKEN or token != ADMIN_TOKEN:
+                    return jsonify({'error': 'nao autorizado'}), 401
+
+                data = request.get_json(force=True, silent=True) or {}
+                chave = data.get('chave', '')
+                if chave not in INDICADORES_VALIDOS:
+                    return jsonify({'error': 'indicador invalido'}), 400
+
+                valor = clip(data.get('valor'), 40)
+                unidade = clip(data.get('unidade'), 20)
+                fonte = clip(data.get('fonte'), 200)
+
+                conn = get_db()
+                conn.execute(
+                    '''INSERT INTO indicadores (chave, valor, unidade, fonte, atualizado_em)
+                       VALUES (?, ?, ?, ?, ?)
+                       ON CONFLICT(chave) DO UPDATE SET
+                         valor=excluded.valor, unidade=excluded.unidade, fonte=excluded.fonte, atualizado_em=excluded.atualizado_em''',
+                    (chave, valor, unidade, fonte, int(time.time()))
+                )
+                conn.commit()
+                conn.close()
+                return jsonify({'ok': True}), 200
+
             if __name__ == '__main__':
                 app.run(host='127.0.0.1', port=5001)
             PYEOF
 
-            echo "== 4. Configurando servico systemd =="
+            echo "== 4. Configurando variavel de ambiente (senha de administrador) =="
+            mkdir -p /etc/observatorio-pesquisa
+            printf 'ADMIN_TOKEN=%s\n' "$ADMIN_TOKEN" > /etc/observatorio-pesquisa/env
+            chmod 600 /etc/observatorio-pesquisa/env
+
+            echo "== 5. Configurando servico systemd =="
             cat > /etc/systemd/system/observatorio-pesquisa.service << 'UNITEOF'
             [Unit]
             Description=Observatorio Petrolina - API da pesquisa
             After=network.target
 
             [Service]
+            EnvironmentFile=/etc/observatorio-pesquisa/env
             WorkingDirectory=/opt/observatorio-pesquisa
             ExecStart=/usr/bin/python3 -m gunicorn -w 2 -b 127.0.0.1:5001 app:app
             Restart=always
@@ -124,7 +182,7 @@ jobs:
             systemctl restart observatorio-pesquisa
             sleep 2
 
-            echo "== 5. Adicionando rota /api/* no Caddy (idempotente) =="
+            echo "== 6. Adicionando rota /api/* no Caddy (idempotente) =="
             python3 << 'PYEOF'
             import re
 
@@ -165,15 +223,17 @@ jobs:
             systemctl reload caddy
             sleep 1
 
-            echo "== 6. Diagnostico =="
+            echo "== 7. Diagnostico =="
             echo "-- status do backend --"
             systemctl is-active observatorio-pesquisa || true
             journalctl -u observatorio-pesquisa --no-pager -n 15 || true
-            echo "-- teste local do backend (deve retornar 200) --"
+            echo "-- teste local /api/respostas (deve retornar 200) --"
             curl -s -o /dev/null -w "HTTP %{http_code}\n" http://127.0.0.1:5001/api/respostas || echo "FALHA ao conectar no backend local"
+            echo "-- teste local /api/indicadores (deve retornar 200) --"
+            curl -s -o /dev/null -w "HTTP %{http_code}\n" http://127.0.0.1:5001/api/indicadores || echo "FALHA ao conectar no backend local"
             echo "-- confirmando rota no Caddyfile --"
             grep -n "reverse_proxy 127.0.0.1:5001" /etc/caddy/Caddyfile || echo "AVISO: rota /api NAO encontrada no Caddyfile"
             echo "-- teste via dominio publico (deve retornar 200) --"
-            curl -s -o /dev/null -w "HTTP %{http_code}\n" https://observatoriopetrolina2.com.br/api/respostas || echo "FALHA ao conectar via dominio publico"
+            curl -s -o /dev/null -w "HTTP %{http_code}\n" https://observatoriopetrolina2.com.br/api/indicadores || echo "FALHA ao conectar via dominio publico"
 
             echo "== DEPLOY CONCLUIDO =="
