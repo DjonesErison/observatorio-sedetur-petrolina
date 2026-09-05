@@ -3,13 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Índice de Imagem · Observatório SEDETUR</title>
-<meta name="description" content="Pesquisa de imagem turística de Petrolina — protótipo do Índice de Imagem Turística.">
+<title>Pesquisa · Observatório SEDETUR</title>
+<meta name="description" content="Pesquisa de opinião sobre a imagem turística de Petrolina, com resultados agregados ao vivo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -154,8 +149,6 @@
 </style>
 </head>
 <body>
-</head>
-<body>
 <div class="gov-strip"></div>
 <div class="gov-bar">Prefeitura de Petrolina · Secretaria de Desenvolvimento Econômico, Inovação, Tecnologia e do Turismo (SEDETUR)</div>
 <div class="topbar">
@@ -166,17 +159,12 @@
   <nav class="tabs" aria-label="Seções do painel">
     <a class="tab" href="/">Hoje</a>
     <a class="tab" href="/comparacao.html">Comparação</a>
-    <a class="tab active" href="#">Imagem do destino</a>
-    <div class="dropdown">
-      <button type="button" class="tab dropdown-trigger">Serviços</button>
-      <div class="dropdown-menu">
-        <a href="/clima.html"><b>Clima</b><span>Vento, chuva, nuvens</span></a>
-        <a href="/comercio.html"><b>Comércio</b><span>Restaurantes, bares, padarias</span></a>
-        <a href="/transito.html"><b>Trânsito</b><span>Vias, pontes, pontos de atenção</span></a>
-        <a href="/saude.html"><b>Saúde</b><span>Farmácias, UBS, hospitais</span></a>
-        <a href="/escolas.html"><b>Escolas municipais</b><span>Rede municipal e localização</span></a>
-      </div>
-    </div>
+    <a class="tab active" href="/pesquisa.html">Pesquisa</a>
+    <a class="tab" href="/clima.html">Clima</a>
+    <a class="tab" href="/comercio.html">Comércio</a>
+    <a class="tab" href="/transito.html">Trânsito</a>
+    <a class="tab" href="/saude.html">Saúde</a>
+    <a class="tab" href="/escolas.html">Escolas municipais</a>
   </nav>
   <div class="who">
     <div class="avatar">DJ</div>
@@ -187,11 +175,11 @@
 
 <div class="wrap">
   <header class="masthead">
-    <div class="eyebrow">Fase 5 · índice de imagem turística (protótipo)</div>
+    <div class="eyebrow">Pesquisa · imagem turística de Petrolina</div>
     <h1>O que os visitantes acham de Petrolina?</h1>
     <p class="lede">Semente do Índice de Imagem Turística: a frente mais barata e rápida das três (Google, redes sociais, pesquisa própria) porque não depende de nenhuma API paga — só de gente respondendo.</p>
     <div class="notice">
-      <b>Isto é um protótipo funcional, não a pesquisa pública final.</b> As respostas ficam guardadas de verdade e a média atualiza ao vivo — mas, como todo Artifact com armazenamento, só funciona para quem está logado nesta mesma organização Claude. Para aplicar com turistas de verdade (QR code no aeroporto, hotéis, pontos turísticos), essa coleta precisa rodar numa ferramenta própria da Prefeitura (Google Forms, Typeform, ou sistema interno) — o formulário abaixo mostra exatamente as perguntas e o formato que funcionaram aqui.
+      <b>Pesquisa em produção.</b> As respostas ficam guardadas de verdade, num banco próprio da Prefeitura (fora do claude.ai), e a média atualiza ao vivo abaixo. Já pode ser aplicada com turistas reais — QR code no aeroporto, hotéis, pontos turísticos — sem depender de login nem de nenhuma ferramenta externa.
     </div>
   </header>
 
@@ -272,7 +260,7 @@
   </div>
 
   <footer>
-    <p><b>Fase 5 (protótipo)</b> — coleta funcional restrita a esta organização Claude; ver aviso acima para o caminho de produção com turistas reais. Painel independente, não vinculado oficialmente à Prefeitura Municipal de Petrolina.</p>
+    <p><b>Pesquisa em produção</b> — coleta pública e funcional, com dados guardados num banco próprio da Prefeitura, fora do claude.ai. Painel independente, não vinculado oficialmente à Prefeitura Municipal de Petrolina.</p>
   </footer>
 </div>
 
@@ -392,7 +380,5 @@
     document.querySelectorAll('.dropdown.open').forEach(function(d){ d.classList.remove('open'); });
   });
 </script>
-</body>
-</html>
 </body>
 </html>

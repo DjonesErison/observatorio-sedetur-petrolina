@@ -226,24 +226,19 @@
     <div class="brand-text"><b>Observatório SEDETUR</b><span>Petrolina-PE</span></div>
   </div>
   <nav class="tabs" aria-label="Seções do painel">
-    <a class="tab " href="https://claude.ai/code/artifact/f4a8abf8-3383-4df1-a00a-3867a8252a6e">Hoje</a>
-    <a class="tab " href="https://claude.ai/code/artifact/4780e82c-2c01-46db-a136-c8e240abd171">Comparação</a>
-    <a class="tab " href="https://claude.ai/code/artifact/f45e8934-d570-486d-aee0-d3db5a10965e">Imagem do destino</a>
-    <div class="dropdown">
-      <button type="button" class="tab dropdown-trigger active">Serviços</button>
-      <div class="dropdown-menu">
-    <a class="" href="https://claude.ai/code/artifact/681fccf8-d157-4878-8862-bfe8fa4736d5"><b>Clima</b><span>Vento, chuva, nuvens</span></a>
-    <a class="" href="https://claude.ai/code/artifact/d473527e-26ca-4099-a6d5-691e8c0b48fc"><b>Comércio</b><span>Restaurantes, bares, padarias</span></a>
-    <a class="" href="https://claude.ai/code/artifact/78b9a61f-18c4-4494-b509-8164205e3d46"><b>Trânsito</b><span>Vias, pontes, pontos de atenção</span></a>
-    <a class="active" href="https://claude.ai/code/artifact/2f183aa6-7ae1-4b5d-b52a-efda060f30ae"><b>Saúde</b><span>Farmácias, UBS, hospitais</span></a>
-    <a class="" href="https://claude.ai/code/artifact/c013615b-0930-47ab-ae30-8416992cbd5c"><b>Escolas municipais</b><span>Rede municipal e localização</span></a>
-      </div>
-    </div>
+    <a class="tab" href="/">Hoje</a>
+    <a class="tab" href="/comparacao.html">Comparação</a>
+    <a class="tab" href="/pesquisa.html">Pesquisa</a>
+    <a class="tab" href="/clima.html">Clima</a>
+    <a class="tab" href="/comercio.html">Comércio</a>
+    <a class="tab" href="/transito.html">Trânsito</a>
+    <a class="tab active" href="/saude.html">Saúde</a>
+    <a class="tab" href="/escolas.html">Escolas municipais</a>
   </nav>
   <div class="who">
     <div class="avatar">DJ</div>
     <div class="who-text"><b>Sessão de demonstração</b>SEDETUR</div>
-    <a class="signout" href="https://claude.ai/code/artifact/f2ecea5e-7ebb-4677-8426-c4eada530f64">Sair</a>
+    <a class="signout" href="/login.html">Sair</a>
   </div>
 </div>
 
@@ -344,6 +339,80 @@
     document.querySelectorAll('.dropdown.open').forEach(function(d){ d.classList.remove('open'); });
   });
 
+</script>
+
+<div class="pesquisa-toast" id="pesquisaToast" hidden>
+  <button type="button" class="pesquisa-toast-close" id="pesquisaToastClose" aria-label="Fechar aviso">×</button>
+  <div class="pesquisa-toast-icon">🗺️</div>
+  <div class="pesquisa-toast-body">
+    <b>Já conhece Petrolina?</b>
+    <p>Conta pra gente o que achou da cidade — leva menos de 1 minuto.</p>
+  </div>
+  <a class="pesquisa-toast-cta" href="/pesquisa.html">Responder pesquisa</a>
+</div>
+<style>
+  .pesquisa-toast{
+    position:fixed; right:18px; bottom:18px; z-index:50; max-width:300px;
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    box-shadow:var(--shadow); padding:16px 16px 14px; display:flex; flex-direction:column; gap:8px;
+    transform:translateY(24px); opacity:0; transition:transform .35s ease, opacity .35s ease;
+  }
+  .pesquisa-toast[hidden]{ display:none; }
+  .pesquisa-toast.show{ transform:translateY(0); opacity:1; }
+  .pesquisa-toast-close{
+    position:absolute; top:8px; right:10px; background:none; border:none; color:var(--muted);
+    font-size:16px; line-height:1; cursor:pointer; padding:4px;
+  }
+  .pesquisa-toast-icon{ font-size:20px; }
+  .pesquisa-toast-body b{ font-size:13.5px; color:var(--ink); display:block; margin-bottom:3px; }
+  .pesquisa-toast-body p{ margin:0; font-size:12.5px; color:var(--ink-2); line-height:1.5; }
+  .pesquisa-toast-cta{
+    align-self:flex-start; margin-top:2px; font-size:12.5px; font-weight:700; color:#fff;
+    background:var(--accent); padding:8px 14px; border-radius:6px; text-decoration:none;
+  }
+  .pesquisa-toast-cta:hover{ filter:brightness(1.08); }
+  @media (max-width:520px){
+    .pesquisa-toast{ left:12px; right:12px; bottom:12px; max-width:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pesquisa-toast{ transition:none; }
+  }
+</style>
+<script>
+(function(){
+  var KEY = 'sedetur_pesquisa_prompt_v1';
+  try { if (sessionStorage.getItem(KEY)) return; } catch(e){}
+
+  var toast = document.getElementById('pesquisaToast');
+  var closeBtn = document.getElementById('pesquisaToastClose');
+  if(!toast) return;
+
+  var shown = false;
+  var timer = setTimeout(reveal, 25000);
+
+  function onScroll(){
+    var scrolled = window.scrollY + window.innerHeight;
+    var full = document.documentElement.scrollHeight;
+    if(full > 0 && scrolled >= full * 0.7) reveal();
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+
+  function reveal(){
+    if(shown) return;
+    shown = true;
+    clearTimeout(timer);
+    window.removeEventListener('scroll', onScroll);
+    toast.hidden = false;
+    requestAnimationFrame(function(){ toast.classList.add('show'); });
+    try { sessionStorage.setItem(KEY, '1'); } catch(e){}
+  }
+
+  function dismiss(){
+    toast.classList.remove('show');
+    setTimeout(function(){ toast.hidden = true; }, 300);
+  }
+  if(closeBtn) closeBtn.addEventListener('click', dismiss);
+})();
 </script>
 </body>
 </html>

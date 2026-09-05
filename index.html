@@ -300,23 +300,19 @@
   </div>
   <nav class="tabs" aria-label="Seções do painel">
     <a class="tab active" href="#hoje">Hoje</a>
-    <a class="tab active" href="#mudou">O que mudou</a>
-    <a class="tab" href="/comparacao.html">Comparação<span class="pill live">Novo</span></a>
-    <a class="tab" href="/pesquisa.html">Imagem do destino<span class="pill live">Novo</span></a>
-    <div class="dropdown">
-      <button type="button" class="tab dropdown-trigger">Serviços</button>
-      <div class="dropdown-menu">
-        <a href="/clima.html"><b>Clima</b><span>Vento, chuva, nuvens</span></a>
-        <a href="/comercio.html"><b>Comércio</b><span>Restaurantes, bares, padarias</span></a>
-        <a href="/transito.html"><b>Trânsito</b><span>Vias, pontes, pontos de atenção</span></a>
-        <a href="/saude.html"><b>Saúde</b><span>Farmácias, UBS, hospitais</span></a>
-        <a href="/escolas.html"><b>Escolas municipais</b><span>Rede municipal e localização</span></a>
-      </div>
-    </div>
+    <a class="tab" href="#mudou">O que mudou</a>
+    <a class="tab" href="/comparacao.html">Comparação</a>
+    <a class="tab" href="/pesquisa.html">Pesquisa</a>
+    <a class="tab" href="/clima.html">Clima</a>
+    <a class="tab" href="/comercio.html">Comércio</a>
+    <a class="tab" href="/transito.html">Trânsito</a>
+    <a class="tab" href="/saude.html">Saúde</a>
+    <a class="tab" href="/escolas.html">Escolas municipais</a>
   </nav>
   <div class="who">
     <div class="avatar">DJ</div>
     <div class="who-text"><b>Sessão de demonstração</b>SEDETUR</div>
+    <a class="signout" href="/admin.html">Admin</a>
     <a class="signout" href="/login.html">Sair</a>
   </div>
 </div>
@@ -324,7 +320,7 @@
 <div class="wrap">
 
   <header class="masthead" id="hoje">
-    <div class="eyebrow">Painel de hoje · protótipo Fase 1</div>
+    <div class="eyebrow">Painel de hoje</div>
     <h1>Petrolina — Inteligência Turística e Econômica</h1>
     <div class="masthead-meta">
       <span>Período de referência varia por indicador — ver fonte em cada card</span>
@@ -333,7 +329,7 @@
     </div>
     <div class="legend">
       <div class="legend-item"><span class="dot real"></span> Dado real, com fonte aberta</div>
-      <div class="legend-item"><span class="dot mock"></span> Dado simulado — aguardando integração (Fase 3–4)</div>
+      <div class="legend-item"><span class="dot mock"></span> Dado simulado — aguardando atualização pela equipe SEDETUR</div>
     </div>
   </header>
 
@@ -378,7 +374,7 @@
         <div class="kpi-label">Ocupação hoteleira</div>
         <div class="kpi-value num">61%</div>
         <div class="kpi-delta down">↓ 12% nos últimos 3 meses</div>
-        <div class="kpi-source">Sem fonte aberta — depende de parceria com hotéis (Fase 4)</div>
+        <div class="kpi-source">Sem fonte pública aberta — atualizável pela equipe SEDETUR</div>
       </div>
 
       <div class="kpi mock" data-indicador="iss_turismo">
@@ -386,7 +382,7 @@
         <div class="kpi-label">ISS Turismo</div>
         <div class="kpi-value num">R$ 1,4 M</div>
         <div class="kpi-delta flat">arrecadação do trimestre</div>
-        <div class="kpi-source">Dado interno — requer acesso à Sec. de Finanças (Fase 3)</div>
+        <div class="kpi-source">Dado interno da Sec. de Finanças — atualizável pela equipe SEDETUR</div>
       </div>
 
       <div class="kpi">
@@ -410,7 +406,7 @@
         <div class="kpi-label">Turistas estimados</div>
         <div class="kpi-value num">≈ 38 mil</div>
         <div class="kpi-delta flat">no período</div>
-        <div class="kpi-source">Sem medição direta — requer metodologia própria (Fase 3)</div>
+        <div class="kpi-source">Sem medição direta — atualizável pela equipe SEDETUR</div>
       </div>
 
     </div>
@@ -431,7 +427,7 @@
       <div class="change-card piorou">
         <div class="change-head"><span class="ch-icon">⬇</span><b>Piorou</b></div>
         <div class="change-list">
-          <div class="change-item"><b>Ocupação hoteleira</b> — queda de 12% nos últimos 3 meses.<span class="src mocksrc">dado simulado</span></div>
+          <div class="change-item" id="mudou-ocupacao_hoteleira" data-indicador="ocupacao_hoteleira"><b>Ocupação hoteleira</b> — queda de 12% nos últimos 3 meses.<span class="src mocksrc">dado simulado</span></div>
         </div>
       </div>
 
@@ -457,16 +453,16 @@
       <div class="teaser">
         <div>
           <h3>Petrolina x cidades comparáveis</h3>
-          <p>Ranking por população e PIB per capita frente a Juazeiro, Feira de Santana, Paulo Afonso, Araripina, Serra Talhada, Garanhuns e as capitais do Nordeste — todas as fontes são IBGE, com uma tabela à parte para empresas ativas.</p>
-          <div class="cities">Fase 5 do roteiro. Metodologia e o que ficou de fora estão documentados na própria página.</div>
+          <p>Ranking por população e PIB per capita frente a Caruaru, Garanhuns, Serra Talhada, Araripina, Arcoverde e Salgueiro, além das capitais do Nordeste — todas as fontes são IBGE, com uma tabela à parte para empresas ativas.</p>
+          <div class="cities">Grupo regional só com cidades de Pernambuco. Metodologia e o que ficou de fora estão documentados na própria página.</div>
         </div>
         <a class="cta" href="/comparacao.html">Ver comparação →</a>
       </div>
       <div class="teaser alt">
         <div>
-          <h3>Índice de Imagem Turística</h3>
-          <p>Pesquisa própria — recomendaria a cidade, voltaria, o que mais gostou e o que faltou — com resultados agregados ao vivo. Protótipo do terceiro pilar do índice, ao lado de avaliações do Google e redes sociais.</p>
-          <div class="cities">Fase 5 do roteiro. Funciona hoje apenas para quem está autenticado na organização da SEDETUR — não é ainda um formulário público.</div>
+          <h3>Pesquisa: imagem turística</h3>
+          <p>Pesquisa própria — recomendaria a cidade, voltaria, o que mais gostou e o que faltou — com resultados agregados ao vivo. Terceiro pilar do índice, ao lado de avaliações do Google e redes sociais.</p>
+          <div class="cities">Já em produção — qualquer visitante pode responder, com resultados ao vivo.</div>
         </div>
         <a class="cta" href="/pesquisa.html">Responder pesquisa →</a>
       </div>
@@ -474,8 +470,7 @@
   </section>
 
   <footer>
-    <p><b>Protótipo de interface (Fase 1)</b> — seis dos nove indicadores já usam dado público real e citado; três (ocupação hoteleira, ISS Turismo, turistas estimados) estão marcados como simulados até a integração das Fases 3–4, conforme o roteiro. Painel independente, não vinculado oficialmente à Prefeitura Municipal de Petrolina.</p>
-    <p style="margin-top:6px;"><a href="/admin.html" style="font-size:11.5px;color:var(--muted);">Equipe SEDETUR: atualizar indicadores manuais →</a></p>
+    <p><b>Painel de hoje</b> — seis dos nove indicadores já usam dado público real e citado; três (ocupação hoteleira, ISS Turismo, turistas estimados) ficam marcados como simulados até que a equipe SEDETUR informe o valor real pelo painel administrativo. Painel independente, não vinculado oficialmente à Prefeitura Municipal de Petrolina.</p>
   </footer>
 
 </div>
@@ -523,7 +518,89 @@
       var sourceEl = card.querySelector('.kpi-source');
       if(sourceEl) sourceEl.textContent = info.fonte ? ('Fonte: ' + info.fonte) : 'Valor informado pela equipe SEDETUR';
     });
+
+    var mudouItem = document.getElementById('mudou-ocupacao_hoteleira');
+    var ocupacao = data.ocupacao_hoteleira;
+    if(mudouItem && ocupacao && ocupacao.valor){
+      mudouItem.innerHTML = '<b>Ocupação hoteleira</b> — agora em ' + ocupacao.valor +
+        ' (atualizado em ' + formatarData(ocupacao.atualizado_em) + ') — ainda sem histórico suficiente para dizer se subiu ou desceu.' +
+        '<span class="src">' + (ocupacao.fonte ? ('Fonte: ' + ocupacao.fonte) : 'Informado pela equipe SEDETUR') + '</span>';
+    }
   }).catch(function(err){ console.warn('erro ao carregar indicadores manuais', err); });
+})();
+</script>
+
+<div class="pesquisa-toast" id="pesquisaToast" hidden>
+  <button type="button" class="pesquisa-toast-close" id="pesquisaToastClose" aria-label="Fechar aviso">×</button>
+  <div class="pesquisa-toast-icon">🗺️</div>
+  <div class="pesquisa-toast-body">
+    <b>Já conhece Petrolina?</b>
+    <p>Conta pra gente o que achou da cidade — leva menos de 1 minuto.</p>
+  </div>
+  <a class="pesquisa-toast-cta" href="/pesquisa.html">Responder pesquisa</a>
+</div>
+<style>
+  .pesquisa-toast{
+    position:fixed; right:18px; bottom:18px; z-index:50; max-width:300px;
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    box-shadow:var(--shadow); padding:16px 16px 14px; display:flex; flex-direction:column; gap:8px;
+    transform:translateY(24px); opacity:0; transition:transform .35s ease, opacity .35s ease;
+  }
+  .pesquisa-toast[hidden]{ display:none; }
+  .pesquisa-toast.show{ transform:translateY(0); opacity:1; }
+  .pesquisa-toast-close{
+    position:absolute; top:8px; right:10px; background:none; border:none; color:var(--muted);
+    font-size:16px; line-height:1; cursor:pointer; padding:4px;
+  }
+  .pesquisa-toast-icon{ font-size:20px; }
+  .pesquisa-toast-body b{ font-size:13.5px; color:var(--ink); display:block; margin-bottom:3px; }
+  .pesquisa-toast-body p{ margin:0; font-size:12.5px; color:var(--ink-2); line-height:1.5; }
+  .pesquisa-toast-cta{
+    align-self:flex-start; margin-top:2px; font-size:12.5px; font-weight:700; color:#fff;
+    background:var(--accent); padding:8px 14px; border-radius:6px; text-decoration:none;
+  }
+  .pesquisa-toast-cta:hover{ filter:brightness(1.08); }
+  @media (max-width:520px){
+    .pesquisa-toast{ left:12px; right:12px; bottom:12px; max-width:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pesquisa-toast{ transition:none; }
+  }
+</style>
+<script>
+(function(){
+  var KEY = 'sedetur_pesquisa_prompt_v1';
+  try { if (sessionStorage.getItem(KEY)) return; } catch(e){}
+
+  var toast = document.getElementById('pesquisaToast');
+  var closeBtn = document.getElementById('pesquisaToastClose');
+  if(!toast) return;
+
+  var shown = false;
+  var timer = setTimeout(reveal, 25000);
+
+  function onScroll(){
+    var scrolled = window.scrollY + window.innerHeight;
+    var full = document.documentElement.scrollHeight;
+    if(full > 0 && scrolled >= full * 0.7) reveal();
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+
+  function reveal(){
+    if(shown) return;
+    shown = true;
+    clearTimeout(timer);
+    window.removeEventListener('scroll', onScroll);
+    toast.hidden = false;
+    requestAnimationFrame(function(){ toast.classList.add('show'); });
+    try { sessionStorage.setItem(KEY, '1'); } catch(e){}
+  }
+
+  function dismiss(){
+    toast.classList.remove('show');
+    setTimeout(function(){ toast.hidden = true; }, 300);
+  }
+  if(closeBtn) closeBtn.addEventListener('click', dismiss);
 })();
 </script>
 </body>
